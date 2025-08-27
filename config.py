@@ -23,9 +23,10 @@ DROPTIME_LOG_CHANNEL = -1002836765689
 MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb+srv://vegetakun447:r4SIiJ1OOhRNLknD@cluster0.z4bsdym.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 DATABASE_NAME = "superhero_collector"
 
-OWNER_ID = 6055447708, 6919874630
+OWNER_ID = 6055447708
 
 # Game Configuration
 STARTING_COINS = 100
 DAILY_REWARD = 50
+
 
