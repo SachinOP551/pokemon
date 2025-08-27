@@ -504,7 +504,7 @@ async def handle_rarity_selection(client: Client, callback_query: CallbackQuery)
         
         confirmation_text = (
             f"<b>📝 Upload Confirmation</b>\n\n"
-            f"🆔 <b>Character ID:</b> {character_id_preview}\n"
+            f"🆔 <b>Pokémon ID:</b> {character_id_preview}\n"
             f"🎀 <b>Name:</b> {data['name']}\n"
             f"⛩️ <b>{ANIME}:</b> {data['anime']}\n"
             f"⭐ <b>Rarity:</b> {data['rarity']}\n"
@@ -578,7 +578,7 @@ async def confirm_upload_handler(client: Client, callback_query: CallbackQuery):
         media_type_text = "Video Character" if data.get('is_video') else "Character"
         await callback_query.message.edit_caption(
             f"✅ {WAIFU} successfully uploaded and added to database!\n\n"
-            f"🆔 <b>Character ID:</b> {character_id}\n"
+            f"🆔 <b>Pokémon ID:</b> {character_id}\n"
             f"🎀 <b>Name:</b> {data['name']}\n"
             f"⛩️ <b>{ANIME}:</b> {data['anime']}\n"
             f"{data['rarity_sign']} <b>Rarity:</b> {data['rarity']}",
@@ -594,7 +594,7 @@ async def confirm_upload_handler(client: Client, callback_query: CallbackQuery):
         
         # Prepare log message
         text = f"<b>✨ New {media_type_text} Uploaded by {callback_query.from_user.mention}!!</b>\n\n"
-        text += f"🆔 <b>Character ID:</b> {character_id}\n"
+        text += f"🆔 <b>Pokémon ID:</b> {character_id}\n"
         text += f"🎀 <b>Name :</b> {data['name']}\n"
         text += f"⛩️ <b>{ANIME} :</b> {data['anime']}\n"
         text += f"{data['rarity_sign']} <b>Rarity</b> : {data['rarity']}\n"
@@ -875,7 +875,7 @@ async def handle_edit_character_id_input(client: Client, message: Message):
         # Show edit options
         edit_text = (
             f"<b>✏️ Edit {WAIFU}</b>\n\n"
-            f"🆔 <b>Character ID:</b> {character_id}\n"
+            f"🆔 <b>Pokémon ID:</b> {character_id}\n"
             f"🎀 <b>Name:</b> {upload_details[user_id]['edit_character']['name']}\n"
             f"⛩️ <b>{ANIME}:</b> {upload_details[user_id]['edit_character']['anime']}\n"
             f"⭐ <b>Rarity:</b> {upload_details[user_id]['edit_character']['rarity']}\n\n"
@@ -1075,7 +1075,7 @@ async def show_edit_confirmation(client: Client, message_or_callback, user_id):
     
     confirmation_text = (
         f"<b>✏️ Edit Confirmation</b>\n\n"
-        f"🆔 <b>Character ID:</b> {character_data['character_id']}\n"
+        f"🆔 <b>Pokémon ID:</b> {character_data['character_id']}\n"
         f"🎀 <b>Name:</b> {character_data['name']}\n"
         f"⛩️ <b>{ANIME}:</b> {character_data['anime']}\n"
         f"⭐ <b>Rarity:</b> {character_data['rarity']}\n"
@@ -2025,4 +2025,5 @@ def register_upload_handlers(app: Client):
     app.add_handler(filters.video & filters.private, handle_edit_image_upload)
  
     app.add_handler(filters.create(lambda _, __, callback_query: callback_query.data == "create_anime"), create_anime_from_upload_handler)
+
 
