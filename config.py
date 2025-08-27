@@ -11,7 +11,7 @@ API_HASH = os.getenv('API_HASH')
 
 
 # PostgreSQL Configuration (Neon DB)
-NEON_URI = os.getenv('NEON_URI', 'postgresql://anime_user:Swami%40447@165.232.187.49:5432/anime')
+NEON_URI = os.getenv('NEON_URI', 'postgresql://pokemon_user:Swami%40447@localhost:5432/pokemon')
 
 
 CATBOX_USERHASH = os.getenv('CATBOX_USERHASH', '0d6e2b43bfd1b9b505ee6d3df')
@@ -28,3 +28,4 @@ OWNER_ID = 6055447708, 6919874630
 # Game Configuration
 STARTING_COINS = 100
 DAILY_REWARD = 50
+
