@@ -63,10 +63,6 @@ RARITY_DATA = {
         "emoji": "❄️",
         "level": 12
     },
-    "Erotic": {
-        "emoji": "🔞",
-        "level": 13
-    },
     "Premium": {
         "emoji": "🧿",
         "level": 13
@@ -972,3 +968,4 @@ async def handle_inline_query(client, inline_query: InlineQuery):
             )
         ))
     await inline_query.answer(results, cache_time=1, next_offset=next_offset)
+
