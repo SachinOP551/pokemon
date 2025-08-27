@@ -50,8 +50,7 @@ RARITIES = {
     "Zenith": 10,
     "Ethereal": 11,
     "Mythic": 12,
-    "Erotic":13,
-    "Premium": 14
+    "Premium": 13
 }
 
 # Define emoji mappings for rarities (same as MongoDB module)
@@ -68,7 +67,6 @@ RARITY_EMOJIS = {
     "Zenith": "💫",
     "Ethereal": "❄️",
     "Mythic": "🔴",
-    "Erotic": "🔞",
     "Premium": "🧿"
 }
 
@@ -95,7 +93,6 @@ OLD_TO_NEW_RARITIES = {
     "💫 Zenith": "Zenith",
     "❄️ Ethereal": "Ethereal",
     "🔴 Mythic": "Mythic",
-    "🔞 Erotic": "Erotic",
     "🧿 Premium": "Premium"
 }
 
@@ -2548,4 +2545,5 @@ async def restart_connection_pool():
         
     except Exception as e:
         logger.error(f"Failed to restart PostgreSQL pool: {e}")
+
         raise
