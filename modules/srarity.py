@@ -27,7 +27,6 @@ RARITY_EMOJIS = {
     "Mythic": "🔴",
     "Zenith": "💫",
     "Ethereal": "❄️",
-    "Erotic": "🔞",
     "Premium": "🧿"
 }
 
@@ -186,4 +185,5 @@ async def show_rarity_list(callback_query: CallbackQuery, rarity: str, page: int
                 [InlineKeyboardButton("🔙 Back", callback_data="r_back")],
                 [InlineKeyboardButton("❌ Close", callback_data="close")]
             ])
+
         )
