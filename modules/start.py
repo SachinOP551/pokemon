@@ -103,13 +103,13 @@ async def start_command(client: Client, message: Message):
     f"⚡ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ᴘᴏᴋᴇᴍᴏɴ ᴛʀᴀɪɴᴇʀ ᴜɴɪᴠᴇʀsᴇ, {user.first_name}!\n\n"
     "ʏᴏᴜʀ ᴊᴏᴜʀɴᴇʏ ᴛᴏ ʙᴇᴄᴏᴍᴇ ᴀ ᴍᴀsᴛᴇʀ ᴘᴏᴋᴇᴍᴏɴ ᴛʀᴀɪɴᴇʀ ʙᴇɢɪɴs ʜᴇʀᴇ.\n\n"
     "✨ ғᴇᴀᴛᴜʀᴇs:\n"
-    "┣ ᴄᴀᴛᴄʜ ᴀ ᴠᴀʀɪᴇᴛʏ ᴏғ ᴘᴏᴋᴇᴍᴏɴ\n"
+    "┣ Collect ᴀ ᴠᴀʀɪᴇᴛʏ ᴏғ ᴘᴏᴋᴇᴍᴏɴ\n"
     "┣ ᴘᴀʀᴛɪᴄɪᴘᴀᴛᴇ ɪɴ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅs ᴀɴᴅ ᴛᴏᴜʀɴᴀᴍᴇɴᴛs\n"
     "┣ ᴇᴀʀɴ ᴛᴏᴋᴇɴs, ʀᴇᴡᴀʀᴅs, ᴀɴᴅ ʀᴀʀᴇ ɪᴛᴇᴍs\n"
     "┗ sʜᴏᴡᴄᴀsᴇ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n\n"
     "🎮 ǫᴜɪᴄᴋ sᴛᴀʀᴛ:\n"
     "┣ /daily - ᴄʟᴀɪᴍ ᴅᴀɪʟʏ ʀᴇᴡᴀʀᴅs\n"
-    "┣ /catch - ʙᴇɢɪɴ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n"
+    "┣ /collect - ʙᴇɢɪɴ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n"
     "┣ /trade - ᴛʀᴀᴅᴇ ᴘᴏᴋᴇᴍᴏɴ ᴡɪᴛʜ ᴏᴛʜᴇʀ ᴛʀᴀɪɴᴇʀs\n"
     "ʀᴇᴀᴅʏ ᴛᴏ ʙᴜɪʟᴅ ʏᴏᴜʀ ᴅʀᴇᴀᴍ ᴘᴏᴋᴇᴍᴏɴ ᴛᴇᴀᴍ?"
 )
@@ -176,7 +176,7 @@ async def help_callback(client: Client, callback_query: CallbackQuery):
     "┣ /claim - ʀᴇᴄᴇɪᴠᴇ ᴀ ᴅᴀɪʟʏ ғʀᴇᴇ ᴘᴏᴋᴇᴍᴏɴ\n"
     "┗ /daily - ᴄʟᴀɪᴍ ᴅᴀɪʟʏ ʀᴇᴡᴀʀᴅs\n\n"
     "🎮 ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n"
-    "┣ /catch - ᴄᴀᴛᴄʜ ᴘᴏᴋᴇᴍᴏɴ\n"
+    "┣ /collect - Collect ᴘᴏᴋᴇᴍᴏɴ\n"
     "┣ /mycollection - ᴠɪᴇᴡ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n"
     "┣ /search - sᴇᴀʀᴄʜ ᴘᴏᴋᴇᴍᴏɴ\n"
     "┣ /check - ᴠɪᴇᴡ ᴘᴏᴋᴇᴍᴏɴ ᴅᴇᴛᴀɪʟs\n"
@@ -224,13 +224,13 @@ async def back_callback(client: Client, callback_query: CallbackQuery):
     welcome_text = (
     f"⚡ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ ᴛʜᴇ ᴘᴏᴋᴇᴍᴏɴ ᴛʀᴀɪɴᴇʀ ᴜɴɪᴠᴇʀsᴇ, {callback_query.from_user.first_name}! 🌟\n\n"
     "✨ ғᴇᴀᴛᴜʀᴇs:\n"
-    "┣ ᴄᴀᴛᴄʜ ᴀ ᴠᴀʀɪᴇᴛʏ ᴏғ ᴘᴏᴋᴇᴍᴏɴ\n"
+    "┣ Collect ᴀ ᴠᴀʀɪᴇᴛʏ ᴏғ ᴘᴏᴋᴇᴍᴏɴ\n"
     "┣ ᴘᴀʀᴛɪᴄɪᴘᴀᴛᴇ ɪɴ ʟᴇᴀᴅᴇʀʙᴏᴀʀᴅs\n"
     "┣ ᴇᴀʀɴ ᴛᴏᴋᴇɴs, ʀᴇᴡᴀʀᴅs & ʀᴀʀᴇ ɪᴛᴇᴍs\n"
     "┗ sʜᴏᴡᴄᴀsᴇ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n\n"
     "🎮 ǫᴜɪᴄᴋ sᴛᴀʀᴛ:\n"
     "┣ /daily - ᴄʟᴀɪᴍ ᴅᴀɪʟʏ ʀᴇᴡᴀʀᴅs\n"
-    "┣ /catch - ʙᴇɢɪɴ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n"
+    "┣ /collect - ʙᴇɢɪɴ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴄᴏʟʟᴇᴄᴛɪᴏɴ\n"
     "┣ /trade - ᴛʀᴀᴅᴇ ᴘᴏᴋᴇᴍᴏɴ ᴡɪᴛʜ ᴏᴛʜᴇʀs\n\n"
     "ʀᴇᴀᴅʏ ᴛᴏ ᴇᴍʙᴀʀᴋ ᴏɴ ʏᴏᴜʀ ᴘᴏᴋᴇᴍᴏɴ ᴛʀᴀɪɴɪɴɢ ᴊᴏᴜʀɴᴇʏ?"
 )
@@ -254,3 +254,4 @@ def setup_start_handlers(app: Client):
     app.on_message(filters.new_chat_members)(new_chat_members)
 
     print("All start handlers registered successfully!")
+
