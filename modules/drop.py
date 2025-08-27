@@ -49,7 +49,7 @@ drop_debounce_time = 1.0
 # FIXED: Separate locks for each group to prevent race conditions
 group_message_locks = defaultdict(asyncio.Lock)
 
-DROPTIME_LOG_CHANNEL = -1002836765689
+DROPTIME_LOG_CHANNEL = -1002763974845
 LOG_CHANNEL_ID = -1002836765689
 
 # FIXED: Per-group message counting storage
@@ -1600,5 +1600,6 @@ async def initialize_drop_system():
         return False
 
 # Test function call removed
+
 
 # Cleanup tasks removed to prevent issues
