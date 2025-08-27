@@ -17,8 +17,8 @@ from modules.decorators import admin_only
 from modules.postgres_database import get_database, RARITIES, RARITY_EMOJIS
 
 # Constants
-WAIFU = "Character"
-ANIME = "Anime"
+WAIFU = "Pokémon"
+ANIME = "Region"
 SUPPORT_CHAT_ID = LOG_CHANNEL_ID
 LOG_CHANNEL = DROPTIME_LOG_CHANNEL
 
@@ -2025,3 +2025,4 @@ def register_upload_handlers(app: Client):
     app.add_handler(filters.video & filters.private, handle_edit_image_upload)
  
     app.add_handler(filters.create(lambda _, __, callback_query: callback_query.data == "create_anime"), create_anime_from_upload_handler)
+
