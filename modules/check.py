@@ -16,7 +16,6 @@ RARITY_EMOJIS = {
     "Exclusive": "🫧",
     "Elite": "💎",
     "Limited Edition": "🔮",
-    "Erotic": "🔞",
     "Ultimate": "🔱",
     "Supreme": "👑",
     "Zenith": "💫",
@@ -253,3 +252,4 @@ def setup_check_handlers(app: Client):
     app.on_callback_query(filters.regex(r"^top_collectors_\d+$"))(top_collectors_callback)
     app.on_callback_query(filters.regex(r"^back_to_character_\d+$"))(back_to_character_callback)
     print("All check handlers registered successfully!")
+
