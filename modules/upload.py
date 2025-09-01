@@ -208,7 +208,7 @@ async def upload_to_imgbb(file_id: str, client) -> str:
                 }
 
                 # ImgBB API key in URL
-                api_key = "4b74c2097adb72dfd0cc7941199d8f4c"
+                api_key = "7f8293a6ed8f0e2363fc4d5a22651cb5"
                 url = f"https://api.imgbb.com/1/upload?key={api_key}"
 
                 async with session.post(url, data=data, headers=headers) as response:
@@ -2025,5 +2025,6 @@ def register_upload_handlers(app: Client):
     app.add_handler(filters.video & filters.private, handle_edit_image_upload)
  
     app.add_handler(filters.create(lambda _, __, callback_query: callback_query.data == "create_anime"), create_anime_from_upload_handler)
+
 
 
