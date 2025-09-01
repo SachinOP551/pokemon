@@ -1613,3 +1613,4 @@ async def initialize_drop_system():
 
 
 # Cleanup tasks removed to prevent issues
+
