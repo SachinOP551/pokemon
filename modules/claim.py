@@ -7,7 +7,7 @@ from .decorators import check_banned
 
 # Hardcoded locked rarities for claim
 LOCKED_RARITIES = [
-    "Elite", "Limited Edition", "Ultimate", "Supreme", "Premium", "Zenith", "Mythic", "Ethereal", "Erotic"
+    "Exclusive", "Elite", "Limited Edition", "Ultimate", "Supreme", "Premium", "Zenith", "Mythic", "Ethereal", "Erotic"
 ]
 import asyncio
 from config import OWNER_ID
@@ -101,7 +101,7 @@ async def claim_command(client: Client, message: Message):
         rarity_emoji = get_rarity_emoji(character['rarity'])
         # Create caption with success message
         caption = (
-            f"<b>🌙 {message.from_user.first_name} ʏᴏᴜ ɢᴏᴛ ᴀ ɴᴇᴡ ᴘᴏᴋᴇᴍᴏɴ!</b>\n\n"
+            f"<b>🌙 {message.from_user.first_name} You Got A New Pokémon!</b>\n\n"
             f"<b>👤 Name:</b> {character['name']}\n"
             f"<b>{rarity_emoji} Rarity:</b> {character['rarity']}\n"
             f"<b>⛩ Region:</b> {character['anime']}\n\n"
@@ -136,3 +136,4 @@ def setup_claim_handlers(app: Client):
     print("Registering claim command handler...")
     app.on_message(filters.command("claim"))(claim_command)
     print("Claim handler registered!")
+
