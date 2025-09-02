@@ -5,7 +5,7 @@ import logging
 from collections import defaultdict
 import time
 import functools
-from telegram import Update
+
 
 class RateLimiter:
     def __init__(self, max_requests: int = 30, time_window: int = 60):
@@ -123,3 +123,4 @@ def rate_limited(func):
         # Call the original function
         return await func(*args, **kwargs)
     return wrapper 
+
