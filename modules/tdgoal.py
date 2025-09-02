@@ -99,8 +99,8 @@ async def tdgoal_command(client: Client, message_or_user, edit_message=None):
         f"<b>Available Rewards:</b>\n"
         f"• 100 characters = <code>90,000 tokens</code>\n"
         f"• 300 characters = <code>350,000 tokens</code>\n"
-        f"• 500 characters = <code>600,000 tokens</code> + <b>random Mythic/Zenith/Ethereal character</b>\n"
-        f"• 800 characters =  <b>2 random Ultimate characters</b>\n\n"
+        f"• 500 characters = <code>600,000 tokens</code> + <b>random Mythic/Zenith/Ethereal Pokemon</b>\n"
+        f"• 800 characters =  <b>A random Ultimate Pokemon</b>\n\n"
     )
     if edit_message:
         await edit_message.edit_text(text, reply_markup=keyboard)
@@ -226,7 +226,7 @@ async def tdgoal_callback(client: Client, callback_query: CallbackQuery):
                 # Try to get 2 Ultimate characters using the new method
                 if hasattr(db, 'get_multiple_random_characters_by_rarity'):
                     try:
-                        selected = await db.get_multiple_random_characters_by_rarity("Ultimate", 2)
+                        selected = await db.get_multiple_random_characters_by_rarity("Ultimate", 1)
                     except Exception as e:
                         selected = []
                 
@@ -234,16 +234,16 @@ async def tdgoal_callback(client: Client, callback_query: CallbackQuery):
                 if not selected:
                     try:
                         ultimate_chars = []
-                        for _ in range(5):  # Try up to 5 times to get 2 unique characters
+                        for _ in range(5):  # Try up to 5 times to get 1 unique characters
                             char = await db.get_random_character_by_rarities(["Ultimate"])
                             if char and char not in ultimate_chars:
                                 ultimate_chars.append(char)
-                                if len(ultimate_chars) >= 2:
+                                if len(ultimate_chars) >= 1:
                                     break
                         
                         # If we got enough characters, select 2
-                        if len(ultimate_chars) >= 2:
-                            selected = ultimate_chars[:2]
+                        if len(ultimate_chars) >= 1:
+                            selected = ultimate_chars[:1]
                         elif len(ultimate_chars) == 1:
                             selected = ultimate_chars
                             
@@ -349,4 +349,5 @@ async def track_collect_drop(user_id: int):
             {'$set': {f'tdgoal_progress.{today}': today_progress}}
         )
     except Exception as e:
+
         print(f"tdgoal track_collect_drop error: {e}")
