@@ -7,7 +7,7 @@ from .decorators import check_banned
 
 # Hardcoded locked rarities for claim
 LOCKED_RARITIES = [
-    "Exclusive", "Elite", "Limited Edition", "Ultimate", "Supreme", "Premium", "Zenith", "Mythic", "Ethereal", "Erotic"
+    "Exclusive", "Elite", "Limited Edition", "Ultimate", "Supreme", "Premium", "Zenith", "Mythic", "Ethereal", "Erotic", "Mega Evolution"
 ]
 import asyncio
 from config import OWNER_ID
@@ -136,4 +136,5 @@ def setup_claim_handlers(app: Client):
     print("Registering claim command handler...")
     app.on_message(filters.command("claim"))(claim_command)
     print("Claim handler registered!")
+
 
