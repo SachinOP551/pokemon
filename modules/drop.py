@@ -987,14 +987,14 @@ async def setup_drop_weights_and_limits(client: Client):
         "Rare": 250,        # 25% of Common
         "Legendary": 180,   # 18% of Common
         "Exclusive": 65,    # 6% of Common
-        "Elite": 60,        # 5.5% of Common
-        "Limited Edition": 50,  # 4.5% of Common
-        "Ultimate": 15,     # 1.5% of Common
-        "Supreme": 8,       # 0.8% of Common
-        "Mythic": 30,       # 3% of Common
-        "Zenith": 5,        # 0.5% of Common
-        "Ethereal": 3,      # 0.3% of Common
-        "Premium": 2        # 0.2% of Common
+        "Elite": 55,        # 5.5% of Common
+        "Limited Edition": 45,  # 4.5% of Common
+        "Ultimate": 0,     # 1.5% of Common
+        "Supreme": 0,       # 0.8% of Common
+        "Mythic": 0,       # 3% of Common
+        "Zenith": 0,        # 0.5% of Common
+        "Ethereal": 0,      # 0.3% of Common
+        "Premium": 0        # 0.2% of Common
     }
     # Set daily limits - None means no limit, 0 means not dropping
     daily_limits = {
@@ -1005,12 +1005,12 @@ async def setup_drop_weights_and_limits(client: Client):
         "Exclusive": None,   # No limit
         "Elite": None,       # No limit
         "Limited Edition": None, # No limit
-        "Ultimate": 2,      # 2 per day
-        "Supreme": 1,       # 1 per day
-        "Mythic": 3,        # 3 per day
-        "Zenith": 1,        # 1 per day
-        "Ethereal": 1,      # 1 per day
-        "Premium": 1        # 1 per day
+        "Ultimate": 0,      # 2 per day
+        "Supreme": 0,       # 1 per day
+        "Mythic": 0,        # 3 per day
+        "Zenith": 0,        # 1 per day
+        "Ethereal": 0,      # 1 per day
+        "Premium": 0        # 1 per day
     }
     # Update settings
     settings['rarity_weights'] = rarity_weights
@@ -1861,4 +1861,5 @@ async def initialize_drop_system():
 
 
 # Cleanup tasks removed to prevent issues
+
 
