@@ -19,8 +19,8 @@ from .postgres_database import get_database, get_rarity_emoji, RARITIES, RARITY_
 from .logging_utils import send_token_log
 
 # Safari Zone constants
-SAFARI_COST = 10  # 10 tokens to enter
-SAFARI_BALLS = 30    # 30 Safari Balls per session
+SAFARI_COST = 55000  # 10 tokens to enter
+SAFARI_BALLS = 25    # 30 Safari Balls per session
 # Removed SAFARI_SESSION_DURATION - sessions now have no time limit
 
 # Safari Zone rarities (Rare to Limited Edition)
@@ -30,7 +30,7 @@ SAFARI_RARITIES = ["Legendary", "Exclusive", "Elite", "Limited Edition"]
 CATCH_RATES = {
     "Legendary": 25,
     "Exclusive": 18,
-    "Elite": 12,
+    "Elite": 10,
     "Limited Edition": 8
 }
 
@@ -1010,3 +1010,4 @@ def register_safari_handlers(app: Client):
     @app.on_callback_query(filters.regex(r"^safari_back_\d+$"))
     async def safari_back_callback_wrapper(client: Client, callback_query: CallbackQuery):
         await safari_back_callback_handler(client, callback_query)
+
