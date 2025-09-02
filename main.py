@@ -480,29 +480,29 @@ async def start_handler(client: Client, message: Message):
     commands = [
         BotCommand("start", "Start the bot"),
 
-        BotCommand("claim", "Claim a daily free character"),
-        BotCommand("collect", "Collect a dropped character"),
-        BotCommand("mycollection", "View your character collection"),
+        BotCommand("claim", "Claim a daily free Pokémon"),
+        BotCommand("catch", "Collect a dropped Pokémon"),
+        BotCommand("mycollection", "View your Pokémon collection"),
         BotCommand("sethandler", "Set a custom keyword to open your collection"),
         BotCommand("changehandler", "Change your collection handler (costs tokens)"),
-        BotCommand("smode", "Switch collection view mode"),
+        BotCommand("smode", "Switch collection preferences"),
         BotCommand("mystore", "View your store"),
         BotCommand("sell", "Sell a character from your collection"),
-        BotCommand("gift", "Gift a character to another user"),
-        BotCommand("trade", "Trade characters with another user"),
-        BotCommand("fuse", "Fuse two exclusive characters"),
+        BotCommand("gift", "Gift a Pokémon to another user"),
+        BotCommand("trade", "Trade Pokémon with another user"),
+        BotCommand("fuse", "Fuse two exclusive Pokémon"),
         BotCommand("fusioninfo", "View fusion rules and info"),
-        BotCommand("check", "Check character info"),
+        BotCommand("dex", "Check Pokémon info"),
         BotCommand("status", "Show your collection stats"),
-        BotCommand("search", "Search for a character"),
-        BotCommand("propose", "Propose a new character"),
+        BotCommand("search", "Search for a Pokémon"),
+        BotCommand("propose", "Propose a new Pokémon"),
         BotCommand("bal", "Check your token balance"),
         BotCommand("daily", "Claim daily tokens"),
         BotCommand("achievement", "View and claim achievements"),
         BotCommand("tdgoal", "Complete tasks to earn tokens"),
-        BotCommand("vidcollection", "View your video character collection"),
-        BotCommand("vidlist", "View the list of video players"),
-        BotCommand("srarity", "Search for a character by rarity"),
+        BotCommand("vidcollection", "View your video Pokémon collection"),
+        BotCommand("vidlist", "View the list of video Pokémon"),
+        BotCommand("srarity", "Search for a Pokémon by rarity"),
         BotCommand("droptime", "Change the drop time"),
         BotCommand("spay", "Send shards to another user"),
         BotCommand("dart", "Play dart game"),
@@ -510,7 +510,7 @@ async def start_handler(client: Client, message: Message):
         BotCommand("roll", "Play roll game"),
         BotCommand("football", "Play football game"),
         BotCommand("sgtop", "View the top 10 shard collectors"),
-        BotCommand("canime", "Browse characters by anime"),
+        BotCommand("cregion", "Browse Pokémon by region"),
         BotCommand("tdtop", "View today's top collectors"),
         BotCommand("safari", "View Safari Zone information"),
         BotCommand("enter", "Enter Safari Zone"),
@@ -532,7 +532,7 @@ async def start_handler(client: Client, message: Message):
 
 
 
-@app.on_message(filters.command("check", prefixes=["/", ".", "!"]))
+@app.on_message(filters.command("dex", prefixes=["/", ".", "!"]))
 @auto_register_user
 @require_database
 async def check_handler(client: Client, message: Message):
@@ -621,7 +621,7 @@ async def remove_og_handler(client: Client, message: Message):
 async def view_admins_handler(client: Client, message: Message):
     await view_admins_command(client, message)
 
-@app.on_message(filters.command("sanime", prefixes=["/", ".", "!"]))
+@app.on_message(filters.command("sregion", prefixes=["/", ".", "!"]))
 @auto_register_user
 @require_database
 async def sanime_handler(client: Client, message: Message):
@@ -684,7 +684,7 @@ async def search_handler(client: Client, message: Message):
     """Handle /search command using the search module"""
     await search_command(client, message)
 
-@app.on_message(filters.command("canime", prefixes=["/", ".", "!"]))
+@app.on_message(filters.command("cregion", prefixes=["/", ".", "!"]))
 @auto_register_user
 @require_database
 async def canime_handler(client: Client, message: Message):
@@ -976,7 +976,7 @@ async def transfer_callback_handler(client: Client, callback_query: CallbackQuer
 async def drop_handler(client: Client, message: Message):
     await drop_command(client, message)
 
-@app.on_message(filters.command("collect", prefixes=["/", ".", "!"]))
+@app.on_message(filters.command("catch", prefixes=["/", ".", "!"]))
 @auto_register_user
 async def collect_handler(client: Client, message: Message):
     await collect_command(client, message)
@@ -1841,3 +1841,4 @@ if __name__ == "__main__":
     print("🔄 Starting bot...")
     
     app.run()
+
