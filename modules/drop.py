@@ -362,12 +362,12 @@ async def handle_message(client: Client, message: Message):
     if group_id not in jackpot_counter:
         jackpot_counter[group_id] = 0
     if group_id not in jackpot_next_interval:
-        jackpot_next_interval[group_id] = random.randint(450, 550)
+        jackpot_next_interval[group_id] = random.randint(350, 400)
     jackpot_counter[group_id] += 1
     if jackpot_counter[group_id] >= jackpot_next_interval[group_id]:
         asyncio.create_task(drop_jackpot(client, group_id))
         jackpot_counter[group_id] = 0
-        jackpot_next_interval[group_id] = random.randint(450, 550)
+        jackpot_next_interval[group_id] = random.randint(350, 400)
 
     # Initialize and update message tracking for spam detection
     if user_id not in message_timestamps.get(group_id, {}):
@@ -471,7 +471,7 @@ async def send_drop_message(client, chat_id, character, current_time):
         
         # Create inline keyboard with CHECK DETAILS IN DM button
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔍 CHECK DETAILS IN DM", url=f"https://t.me/{BOT_USERNAME}?start=details_{character['character_id']}")]
+            [InlineKeyboardButton("🔍 CHECK DETAILS IN PM", url=f"https://t.me/{BOT_USERNAME}?start=details_{character['character_id']}")]
         ])
         
         if character.get('is_video', False):
@@ -1337,12 +1337,12 @@ async def handle_single_message(client, message, current_time):
     if group_id not in jackpot_counter:
         jackpot_counter[group_id] = 0
     if group_id not in jackpot_next_interval:
-        jackpot_next_interval[group_id] = random.randint(450, 550)
+        jackpot_next_interval[group_id] = random.randint(350, 400)
     jackpot_counter[group_id] += 1
     if jackpot_counter[group_id] >= jackpot_next_interval[group_id]:
         asyncio.create_task(drop_jackpot(client, group_id))
         jackpot_counter[group_id] = 0
-        jackpot_next_interval[group_id] = random.randint(450, 550)
+        jackpot_next_interval[group_id] = random.randint(350, 400)
     
     # FIXED: Use per-group lock to prevent race conditions between different groups
     async with group_message_locks[group_id]:
@@ -1414,7 +1414,7 @@ async def handle_reply_collection(client: Client, message: Message):
                         for row in rm.inline_keyboard:
                             for btn in row:
                                 text = getattr(btn, 'text', '') or ''
-                                if 'CHECK DETAILS IN DM' in text:
+                                if 'CHECK DETAILS IN PM' in text:
                                     is_drop_like = True
                                     break
                             if is_drop_like:
@@ -1509,12 +1509,10 @@ async def process_character_collection(client: Client, message: Message, charact
         
         # Check if character is already being collected
         if message_id in collecting_characters[chat_id]:
-            await message.reply_text("⚠️ This Pokémon is already being collected by someone else!")
             return
         
         # Check if user is already collecting this character
         if message_id in user_collecting[user_id]:
-            await message.reply_text("⚠️ You are already trying to collect this character!")
             return
         
         # Mark character as being collected
@@ -1548,7 +1546,7 @@ async def process_character_collection(client: Client, message: Message, charact
             character_id = character['character_id']
             
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(f"👑 {user_name}'s Collection", switch_inline_query_current_chat=f"collection:{user_id}")]
+                [InlineKeyboardButton(f"{user_name}'s Collection", switch_inline_query_current_chat=f"collection:{user_id}")]
             ])
             
             bonus_text = ""
@@ -1861,5 +1859,6 @@ async def initialize_drop_system():
 
 
 # Cleanup tasks removed to prevent issues
+
 
 
