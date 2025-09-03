@@ -1,0 +1,31 @@
+{
+    "Necrozma Dusk Mane": {
+      "base_stats": {"hp": 97, "atk": 157, "def": 127, "spa": 113, "spd": 109, "spe": 77},
+      "max_level_stats": {"hp": 398, "atk": 408, "def": 337, "spa": 259, "spd": 255, "spe": 172},
+      "types": ["Steel", "Psychic"],
+      "height": 2.5,
+      "weight": 230.0,
+      "abilities": ["Prism Armor"],
+      "moves": [
+        {"name": "Prismatic Laser", "type": "Psychic", "power": 160, "accuracy": 100, "class": "special"},
+        {"name": "Sunsteel Strike", "type": "Steel", "power": 100, "accuracy": 100, "class": "physical"},
+        {"name": "Earth Quake", "type": "Ground", "power": 100, "accuracy": 100, "class": "physical"},
+        {"name": "Rock Blast", "type": "Rock", "power": 125, "accuracy": 90, "class": "physical"}
+      ]
+    },
+    "Necrozma Dawn Wings": {
+      "base_stats": {"hp": 97, "atk": 113, "def": 109, "spa": 157, "spd": 127, "spe": 77},
+      "max_level_stats": {"hp": 377, "atk": 259, "def": 255, "spa": 408, "spd": 337, "spe": 172},
+      "types": ["Ghost", "Psychic"],
+      "height": 2.5,
+      "weight": 230.0,
+      "abilities": ["Levitate"],
+      "moves": [
+        {"name": "Prismatic Laser", "type": "Psychic", "power": 160, "accuracy": 100, "class": "special"},
+        {"name": "Moongeist Beam", "type": "Ghost", "power": 100, "accuracy": 100, "class": "special"},
+        {"name": "Solar Beam", "type": "Grass", "power": 120, "accuracy": 100, "class": "special"},
+        {"name": "Dragon Pulse", "type": "Dragon", "power": 85, "accuracy": 100, "class": "special"}
+      ]
+    }
+  }
+  
