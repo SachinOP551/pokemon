@@ -522,6 +522,7 @@ async def start_handler(client: Client, message: Message):
         BotCommand("addteam", "Add a Pokemon to your team"),
         BotCommand("removeteam", "Remove a Pokemon from your team"),
         BotCommand("poke", "View your owned Pokémon by ID"),
+        BotCommand("explore", "Explore a pokemon region")
     ]
     
     try:
@@ -1863,3 +1864,4 @@ if __name__ == "__main__":
     print("🔄 Starting bot...")
     
     app.run()
+
