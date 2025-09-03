@@ -214,7 +214,11 @@ POKEMON_NAME_MAP = {
     "mega pidgeot": "pidgeot-mega",
     "mega alakazam": "alakazam-mega",
     "mega gengar": "gengar-mega",
-    "mega gardevoir": "gardevoir-mega"
+    "mega gardevoir": "gardevoir-mega",
+    "mega lucario": "lucario-mega",
+    "mega garchomp": "garchomp-mega",
+    "shiny mega metagross": "metagross-mega",
+    "mega latias": "latias-mega",
 }
 
 def normalize_name(name: str) -> str:
@@ -678,5 +682,6 @@ async def poke_callback_handler(client: Client, callback_query: CallbackQuery):
             await callback_query.answer()
         except Exception:
             await callback_query.answer("Unable to update.", show_alert=True)
+
 
 
