@@ -42,7 +42,7 @@ RARITY_PRICES = {
     "Mega Evolution": 40000000  # 4 crore tokens
 }
 
-ULTIMATE_SHARD_PRICE = 180000  # 120K shards
+ULTIMATE_SHARD_PRICE = 120000  # 120K shards
 
 STORE_IMAGE_URL = "https://ibb.co/cKVVS0wm"
 REFRESH_COST = 65000    
@@ -574,3 +574,4 @@ async def refresh_all_stores_command(client: Client, message: Message):
         await db.update_user(user_id, {"store_offer": offer})
         updated += 1
     await message.reply(f"✅ Refreshed store for <b>{updated}</b> users.")
+
