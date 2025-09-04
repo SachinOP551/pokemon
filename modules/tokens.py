@@ -1415,7 +1415,7 @@ explore_last_used = {}
 explore_message_owners = {}  # Track who owns each explore message
 explore_message_timestamps = {}  # Track when messages were created
 explore_message_chats = {}  # Track chat_id for each message
-EXPLORE_COOLDOWN = 90  # 3 minutes
+EXPLORE_COOLDOWN = 120  # 3 minutes
 EXPLORE_MESSAGE_EXPIRY = 300  # 5 minutes - messages expire after this time
 
 @check_banned
@@ -1607,18 +1607,18 @@ async def explore_callback(client: Client, callback_query: CallbackQuery):
             "alola": {"tokens": 1.0, "shards": 1.1},        # Low rewards
             "hisui": {"tokens": 1.3, "shards": 1.2},        # Medium rewards
             "paldea": {"tokens": 1.4, "shards": 1.3},       # High rewards
-            "indigo plateau": {"tokens": 1.7, "shards": 1.6},  # Elite-level rewards
-            "crown tundra": {"tokens": 1.5, "shards": 1.7},    # Legendary den shard boost
+            "indigo plateau": {"tokens": 1.7, "shards": 1.2},  # Elite-level rewards
+            "crown tundra": {"tokens": 1.5, "shards": 1.2},    # Legendary den shard boost
             "orange islands": {"tokens": 1.2, "shards": 1.0},  # Balanced, adventure region
             "sevii islands": {"tokens": 1.1, "shards": 1.2},   # Exploration-focused
             "orre": {"tokens": 1.0, "shards": 1.3},            # Harsh desert, shard-heavy
             "almia": {"tokens": 1.2, "shards": 1.2},           # Ranger region, balanced
             "fiore": {"tokens": 1.1, "shards": 1.1},           # Peaceful, low rewards
-            "oblivia": {"tokens": 1.3, "shards": 1.4},         # Exotic ruins, shard bonus
-            "battle frontier": {"tokens": 1.8, "shards": 1.8}, # Max difficulty, top rewards
-            "distortion world": {"tokens": 1.4, "shards": 1.8},# Shard-heavy, rare dimension
-            "mt. silver": {"tokens": 1.6, "shards": 1.5},      # Endgame challenge
-            "area zero": {"tokens": 1.5, "shards": 1.7},        # High risk, high reward
+            "oblivia": {"tokens": 1.3, "shards": 1.2},         # Exotic ruins, shard bonus
+            "battle frontier": {"tokens": 1.8, "shards": 1.2}, # Max difficulty, top rewards
+            "distortion world": {"tokens": 1.4, "shards": 1.2},# Shard-heavy, rare dimension
+            "mt. silver": {"tokens": 1.6, "shards": 1.2},      # Endgame challenge
+            "area zero": {"tokens": 1.5, "shards": 1.2},        # High risk, high reward
             }
 
             
