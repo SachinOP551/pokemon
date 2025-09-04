@@ -89,6 +89,9 @@ class TeamManager:
     @staticmethod
     async def create_or_update_team(user_id: int, pokemon_ids: List[int], team_name: str = "My Team") -> bool:
         """Create new team or update existing one"""
+        print(f"DEBUG: create_or_update_team called for user {user_id}")
+        print(f"DEBUG: New pokemon_ids order: {pokemon_ids}")
+        
         pool = get_postgres_pool()
         if not pool:
             return False
@@ -102,6 +105,7 @@ class TeamManager:
                 
                 if existing:
                     # Update existing team
+                    print(f"DEBUG: Updating existing team with IDs: {pokemon_ids}")
                     await conn.execute('''
                         UPDATE teams 
                         SET pokemon_ids = $1, team_name = $2, updated_at = CURRENT_TIMESTAMP
@@ -109,10 +113,20 @@ class TeamManager:
                     ''', pokemon_ids, team_name, user_id)
                 else:
                     # Create new team
+                    print(f"DEBUG: Creating new team with IDs: {pokemon_ids}")
                     await conn.execute('''
                         INSERT INTO teams (user_id, team_name, pokemon_ids)
                         VALUES ($1, $2, $3)
                     ''', user_id, team_name, pokemon_ids)
+                
+                # Verify the update
+                updated_team = await conn.fetchrow('''
+                    SELECT pokemon_ids FROM teams WHERE user_id = $1 AND is_active = TRUE
+                ''', user_id)
+                if updated_team:
+                    print(f"DEBUG: Team updated successfully. New DB order: {updated_team['pokemon_ids']}")
+                else:
+                    print("DEBUG: Failed to verify team update")
                 
                 return True
         except Exception as e:
@@ -219,8 +233,12 @@ class TeamManager:
     @staticmethod
     async def get_team_details(user_id: int) -> Optional[Dict]:
         """Get detailed information about user's team including Pokemon details"""
+        print(f"DEBUG: get_team_details called for user {user_id}")
         db = get_database()
         team = await TeamManager.get_user_team(user_id)
+        
+        if team:
+            print(f"DEBUG: Retrieved team pokemon_ids from DB: {team['pokemon_ids']}")
         
         if not team or not team['pokemon_ids']:
             return None
@@ -234,10 +252,13 @@ class TeamManager:
                 owned_ids = set()
 
             original_ids = list(team['pokemon_ids'])
+            print(f"DEBUG: Original IDs from team: {original_ids}")
             valid_ids = [pid for pid in original_ids if pid in owned_ids]
+            print(f"DEBUG: Valid IDs after ownership check: {valid_ids}")
 
             # If stored team has unowned pokemon, auto-correct it in DB
             if valid_ids != original_ids:
+                print(f"DEBUG: Auto-correcting team due to unowned Pokemon")
                 await TeamManager.create_or_update_team(user_id, valid_ids, team['team_name'])
 
             if not valid_ids:
@@ -253,23 +274,32 @@ class TeamManager:
             pool = get_postgres_pool()
             async with pool.acquire() as conn:
                 rows = await conn.fetch('''
-                    SELECT character_id, name, rarity, anime, img_url, file_id, is_video
+                    SELECT character_id, name, rarity, anime, img_url, file_id, is_video, type
                     FROM characters 
                     WHERE character_id = ANY($1::int[])
-                    ORDER BY character_id
                 ''', valid_ids)
                 
-                pokemon_details = []
+                # Create a lookup dictionary for Pokemon details
+                pokemon_lookup = {}
                 for row in rows:
-                    pokemon_details.append({
+                    pokemon_lookup[row['character_id']] = {
                         'character_id': row['character_id'],
                         'name': row['name'],
                         'rarity': row['rarity'],
                         'anime': row['anime'],
                         'img_url': row['img_url'],
                         'file_id': row['file_id'],
-                        'is_video': row['is_video']
-                    })
+                        'is_video': row['is_video'],
+                        'type': row['type']
+                    }
+                
+                # Build pokemon_details in the correct order based on valid_ids
+                pokemon_details = []
+                for pokemon_id in valid_ids:
+                    if pokemon_id in pokemon_lookup:
+                        pokemon_details.append(pokemon_lookup[pokemon_id])
+                
+                print(f"DEBUG: Final pokemon_details order: {[p['character_id'] for p in pokemon_details]}")
                 
                 return {
                     'team_name': team['team_name'],
@@ -334,6 +364,97 @@ class TeamManager:
         except Exception as e:
             print(f"Error getting Pokemon info: {e}")
             return {"name": "Unknown Pokemon", "rarity": "", "type": ""}
+    
+    @staticmethod
+    async def swap_pokemon_positions(user_id: int, position1: int, position2: int) -> tuple[bool, str]:
+        """Swap two Pokemon positions in the team"""
+        team = await TeamManager.get_user_team(user_id)
+        
+        if not team:
+            return False, "❌ You don't have an active team!"
+        
+        current_pokemon = team['pokemon_ids']
+        team_size = len(current_pokemon)
+        
+        # Validate positions (1-based to 0-based conversion)
+        pos1_idx = position1 - 1
+        pos2_idx = position2 - 1
+        
+        if pos1_idx < 0 or pos1_idx >= team_size:
+            return False, f"❌ Position {position1} is invalid! Your team has {team_size} Pokemon."
+        
+        if pos2_idx < 0 or pos2_idx >= team_size:
+            return False, f"❌ Position {position2} is invalid! Your team has {team_size} Pokemon."
+        
+        if pos1_idx == pos2_idx:
+            return False, "❌ You can't swap a Pokemon with itself!"
+        
+        # Get Pokemon names for confirmation message
+        pokemon1_name = await TeamManager.get_pokemon_name(current_pokemon[pos1_idx])
+        pokemon2_name = await TeamManager.get_pokemon_name(current_pokemon[pos2_idx])
+        
+        # Perform the swap
+        print(f"DEBUG: Before swap - Pokemon IDs: {current_pokemon}")
+        print(f"DEBUG: Swapping positions {position1} ({pos1_idx}) and {position2} ({pos2_idx})")
+        print(f"DEBUG: Pokemon at pos {position1}: {current_pokemon[pos1_idx]}")
+        print(f"DEBUG: Pokemon at pos {position2}: {current_pokemon[pos2_idx]}")
+        
+        current_pokemon[pos1_idx], current_pokemon[pos2_idx] = current_pokemon[pos2_idx], current_pokemon[pos1_idx]
+        
+        print(f"DEBUG: After swap - Pokemon IDs: {current_pokemon}")
+        
+        # Update the team
+        success = await TeamManager.create_or_update_team(user_id, current_pokemon, team['team_name'])
+        
+        if success:
+            return True, f"✅ Successfully swapped positions!\n🔄 {pokemon1_name} (Position {position1}) ↔ {pokemon2_name} (Position {position2})"
+        else:
+            return False, "❌ Failed to update team positions. Please try again."
+    
+    @staticmethod
+    async def move_pokemon_to_position(user_id: int, from_position: int, to_position: int) -> tuple[bool, str]:
+        """Move a Pokemon from one position to another, shifting others"""
+        team = await TeamManager.get_user_team(user_id)
+        
+        if not team:
+            return False, "❌ You don't have an active team!"
+        
+        current_pokemon = team['pokemon_ids']
+        team_size = len(current_pokemon)
+        
+        # Validate positions (1-based to 0-based conversion)
+        from_idx = from_position - 1
+        to_idx = to_position - 1
+        
+        if from_idx < 0 or from_idx >= team_size:
+            return False, f"❌ Position {from_position} is invalid! Your team has {team_size} Pokemon."
+        
+        if to_idx < 0 or to_idx >= team_size:
+            return False, f"❌ Position {to_position} is invalid! Your team has {team_size} Pokemon."
+        
+        if from_idx == to_idx:
+            return False, "❌ Pokemon is already in that position!"
+        
+        # Get Pokemon name for confirmation
+        pokemon_name = await TeamManager.get_pokemon_name(current_pokemon[from_idx])
+        
+        # Remove Pokemon from original position and insert at new position
+        print(f"DEBUG: Before move - Pokemon IDs: {current_pokemon}")
+        print(f"DEBUG: Moving from position {from_position} ({from_idx}) to position {to_position} ({to_idx})")
+        print(f"DEBUG: Pokemon to move: {current_pokemon[from_idx]}")
+        
+        pokemon_to_move = current_pokemon.pop(from_idx)
+        current_pokemon.insert(to_idx, pokemon_to_move)
+        
+        print(f"DEBUG: After move - Pokemon IDs: {current_pokemon}")
+        
+        # Update the team
+        success = await TeamManager.create_or_update_team(user_id, current_pokemon, team['team_name'])
+        
+        if success:
+            return True, f"✅ Successfully moved {pokemon_name} from position {from_position} to position {to_position}!"
+        else:
+            return False, "❌ Failed to update team positions. Please try again."
 
 
 # Command handlers
@@ -363,13 +484,21 @@ async def team_command(client: Client, message: Message):
         team_text += "<b>Your Team:</b>\n"
         for i, pokemon in enumerate(team_details['pokemon_details'], 1):
             rarity_emoji = get_rarity_emoji(pokemon['rarity'])
-            team_text += f"{i}. {rarity_emoji} <b>{pokemon['name']}</b>\n"
-            team_text += f"   └ {pokemon['anime']} • {pokemon['rarity']}\n"
+            pokemon_type = format_pokemon_type(pokemon.get('type', 'Unknown'))
+            team_text += f"{i}. {rarity_emoji} <b>{pokemon['name']}</b> (ID: {pokemon['character_id']})\n"
+            team_text += f"   └ {pokemon['anime']} • {pokemon_type}\n"
     else:
         team_text += "📝 <i>No Pokemon in your team yet</i>\n"
     
     team_text += f"\n⏰ <i>Last updated: {team_details['updated_at'].strftime('%Y-%m-%d %H:%M')}</i>"
-    await message.reply_text(team_text)
+    
+    # Add edit button for teams with Pokemon
+    if team_details['pokemon_details']:
+        keyboard = [[InlineKeyboardButton("📝 Edit Team", callback_data=f"edit_team_{user_id}")]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await message.reply_text(team_text, reply_markup=reply_markup)
+    else:
+        await message.reply_text(team_text)
 
 @auto_register_user
 async def addteam_command(client: Client, message: Message):
@@ -434,6 +563,148 @@ async def removeteam_command(client: Client, message: Message):
         await message.reply_text(msg)
     else:
         await message.reply_text(msg)
+
+@auto_register_user
+async def editteam_command(client: Client, message: Message):
+    """Handle /editteam command - edit team positions interactively"""
+    user_id = message.from_user.id
+    
+    # Ensure team table exists
+    await TeamManager.ensure_team_table()
+    
+    # Get current team
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    if not team_details or not team_details['pokemon_details']:
+        await message.reply_text(
+            "❌ <b>You don't have any team yet.</b>\n\n"
+            "Create a team first using <code>/addteam &lt;id&gt;</code>."
+        )
+        return
+    
+    # Show interactive team edit interface
+    await show_team_edit_ui(client, message, user_id)
+
+@auto_register_user
+async def swapteam_command(client: Client, message: Message):
+    """Handle /swapteam command - swap two Pokemon positions"""
+    user_id = message.from_user.id
+    
+    # Parse positions from command
+    parts = message.text.split()
+    if len(parts) < 3:
+        await message.reply_text(
+            "<b>Usage:</b> <code>/swapteam [position1] [position2]</code>\n\n"
+            "<b>Example:</b> <code>/swapteam 1 3</code>\n\n"
+            "This will swap the Pokemon in position 1 with the Pokemon in position 3.\n\n"
+            "Use <code>/team</code> to see your current team positions."
+        )
+        return
+    
+    try:
+        position1 = int(parts[1])
+        position2 = int(parts[2])
+    except ValueError:
+        await message.reply_text("❌ Please provide valid position numbers.")
+        return
+    
+    # Swap Pokemon positions
+    success, msg = await TeamManager.swap_pokemon_positions(user_id, position1, position2)
+    await message.reply_text(msg)
+
+@auto_register_user
+async def moveteam_command(client: Client, message: Message):
+    """Handle /moveteam command - move Pokemon to a different position"""
+    user_id = message.from_user.id
+    
+    # Parse positions from command
+    parts = message.text.split()
+    if len(parts) < 3:
+        await message.reply_text(
+            "<b>Usage:</b> <code>/moveteam [from_position] [to_position]</code>\n\n"
+            "<b>Example:</b> <code>/moveteam 2 1</code>\n\n"
+            "This will move the Pokemon from position 2 to position 1 (shifting others).\n\n"
+            "Use <code>/team</code> to see your current team positions."
+        )
+        return
+    
+    try:
+        from_position = int(parts[1])
+        to_position = int(parts[2])
+    except ValueError:
+        await message.reply_text("❌ Please provide valid position numbers.")
+        return
+    
+    # Move Pokemon position
+    success, msg = await TeamManager.move_pokemon_to_position(user_id, from_position, to_position)
+    await message.reply_text(msg)
+
+# Access control helper
+async def check_team_edit_access(callback_query: CallbackQuery) -> bool:
+    """Check if user has access to edit team (simple version)"""
+    callback_user_id = callback_query.from_user.id
+    team = await TeamManager.get_user_team(callback_user_id)
+    
+    if not team or not team.get('pokemon_ids'):
+        await callback_query.answer("❌ Access denied! You don't have a team to edit.", show_alert=True)
+        return False
+    
+    return True
+
+async def check_team_edit_access_with_id(callback_query: CallbackQuery, callback_data: str) -> bool:
+    """Check if user has access to edit team with user ID verification"""
+    callback_user_id = callback_query.from_user.id
+    
+    # Extract owner user ID from callback data
+    try:
+        owner_user_id = int(callback_data.split("_")[-1])
+    except (ValueError, IndexError):
+        await callback_query.answer("❌ Access denied! Invalid team data.", show_alert=True)
+        return False
+    
+    # Check if callback user matches team owner
+    if callback_user_id != owner_user_id:
+        await callback_query.answer("❌ Access denied! You can only edit your own team.", show_alert=True)
+        return False
+    
+    return True
+
+# Interactive team edit UI
+async def show_team_edit_ui(client: Client, message: Message, user_id: int):
+    """Show interactive team editing interface"""
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    if not team_details or not team_details['pokemon_details']:
+        await message.reply_text("❌ Your team is empty!")
+        return
+    
+    # Create team display text with numbered positions
+    team_text = f"<b>📝 Edit {team_details['team_name']}</b>\n\n"
+    team_text += f"<b>Team Size:</b> {team_details['pokemon_count']}/{MAX_TEAM_SIZE}\n\n"
+    team_text += "<b>Current Team Order:</b>\n"
+    
+    for i, pokemon in enumerate(team_details['pokemon_details'], 1):
+        rarity_emoji = get_rarity_emoji(pokemon['rarity'])
+        pokemon_type = format_pokemon_type(pokemon.get('type', 'Unknown'))
+        team_text += f"<b>{i}.</b> {rarity_emoji} <b>{pokemon['name']}</b> (ID: {pokemon['character_id']})\n"
+        team_text += f"    └ {pokemon['anime']} • {pokemon_type}\n"
+    
+    team_text += "\n📝 <b>Edit Options:</b>\n"
+    team_text += "• <b>Swap:</b> Exchange positions of two Pokemon\n"
+    team_text += "• <b>Move:</b> Move a Pokemon to a different position\n"
+    team_text += "• <b>Commands:</b> Use /swapteam or /moveteam for quick edits"
+    
+    # Create inline keyboard for editing options
+    keyboard = []
+    
+    # Add swap buttons (2x3 grid for positions)
+    keyboard.append([InlineKeyboardButton("🔄 Quick Swap Positions", callback_data="team_edit_swap_menu")])
+    keyboard.append([InlineKeyboardButton("➡️ Move Pokemon Position", callback_data="team_edit_move_menu")])
+    keyboard.append([InlineKeyboardButton("🔄 Reverse Team Order", callback_data="team_edit_reverse")])
+    keyboard.append([InlineKeyboardButton("🔙 Back to Team", callback_data="back_to_team")])
+    
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await message.reply_text(team_text, reply_markup=reply_markup)
 
 # Callback handlers
 async def team_callback_handler(client: Client, callback_query: CallbackQuery):
@@ -542,9 +813,121 @@ async def team_callback_handler(client: Client, callback_query: CallbackQuery):
             ])
         )
     
+    elif data.startswith("edit_team_"):
+        # Show team editing interface with access control
+        callback_user_id = callback_query.from_user.id
+        
+        # Extract the team owner ID from callback data
+        team_owner_id = int(data.split("_")[-1])
+        
+        # Check if the callback user is the team owner
+        if callback_user_id != team_owner_id:
+            await callback_query.answer("❌ Access denied! You can only edit your own team.", show_alert=True)
+            return
+        
+        # Verify the user has a team
+        team_details = await TeamManager.get_team_details(callback_user_id)
+        
+        if not team_details or not team_details['pokemon_details']:
+            await callback_query.answer("❌ Your team is empty!", show_alert=True)
+            return
+        
+        await show_team_edit_ui_callback(client, callback_query)
+    
+    elif data.startswith("team_edit_swap_menu_"):
+        # Check access - user must be editing their own team
+        if not await check_team_edit_access_with_id(callback_query, data):
+            return
+        await show_swap_menu(client, callback_query)
+    
+    elif data.startswith("team_edit_move_menu_"):
+        # Check access - user must be editing their own team
+        if not await check_team_edit_access_with_id(callback_query, data):
+            return
+        await show_move_menu(client, callback_query)
+    
+    elif data.startswith("team_edit_reverse_"):
+        # Check access - user must be editing their own team
+        if not await check_team_edit_access_with_id(callback_query, data):
+            return
+        user_id = callback_query.from_user.id
+        team = await TeamManager.get_user_team(user_id)
+        
+        if team and team['pokemon_ids']:
+            reversed_pokemon = list(reversed(team['pokemon_ids']))
+            success = await TeamManager.create_or_update_team(user_id, reversed_pokemon, team['team_name'])
+            
+            if success:
+                await callback_query.answer("✅ Team order reversed!", show_alert=True)
+                await show_team_edit_ui_callback(client, callback_query)
+            else:
+                await callback_query.answer("❌ Failed to reverse team order!", show_alert=True)
+        else:
+            await callback_query.answer("❌ Your team is empty!", show_alert=True)
+    
+    elif data.startswith("swap_pos_"):
+        if not await check_team_edit_access(callback_query):
+            return
+        await handle_swap_selection(client, callback_query)
+    
+    elif data.startswith("move_from_"):
+        if not await check_team_edit_access(callback_query):
+            return
+        await handle_move_selection(client, callback_query)
+    
+    elif data.startswith("swap_exec_"):
+        if not await check_team_edit_access(callback_query):
+            return
+        # Execute the swap: format is swap_exec_pos1_pos2
+        parts = data.split("_")
+        position1 = int(parts[2])
+        position2 = int(parts[3])
+        
+        user_id = callback_query.from_user.id
+        success, msg = await TeamManager.swap_pokemon_positions(user_id, position1, position2)
+        
+        if success:
+            await callback_query.answer("✅ Pokemon positions swapped!", show_alert=True)
+            await show_team_edit_ui_callback(client, callback_query)
+        else:
+            await callback_query.answer(f"❌ {msg}", show_alert=True)
+    
+    elif data.startswith("move_exec_"):
+        if not await check_team_edit_access(callback_query):
+            return
+        # Execute the move: format is move_exec_from_to
+        parts = data.split("_")
+        from_position = int(parts[2])
+        to_position = int(parts[3])
+        
+        user_id = callback_query.from_user.id
+        success, msg = await TeamManager.move_pokemon_to_position(user_id, from_position, to_position)
+        
+        if success:
+            await callback_query.answer("✅ Pokemon moved!", show_alert=True)
+            await show_team_edit_ui_callback(client, callback_query)
+        else:
+            await callback_query.answer(f"❌ {msg}", show_alert=True)
+    
     elif data == "back_to_team":
         # Refresh team display
         await team_command(client, callback_query.message)
+
+def format_pokemon_type(pokemon_type: str) -> str:
+    """Format Pokemon type for display"""
+    if not pokemon_type or pokemon_type.lower() in ['unknown', 'none', '']:
+        return "Unknown Type"
+    
+    # Handle multiple types separated by various delimiters
+    import re
+    types = [t.strip().title() for t in re.split(r'[|/,+]', pokemon_type) if t.strip()]
+    
+    if not types:
+        return "Unknown Type"
+    elif len(types) == 1:
+        return types[0]
+    else:
+        return " / ".join(types[:2])  # Show max 2 types
 
 def get_rarity_emoji(rarity: str) -> str:
     """Get emoji for rarity"""
@@ -566,11 +949,174 @@ def get_rarity_emoji(rarity: str) -> str:
     }
     return rarity_emojis.get(rarity, "❓")
 
+async def show_team_edit_ui_callback(client: Client, callback_query: CallbackQuery):
+    """Show team edit UI in callback context"""
+    user_id = callback_query.from_user.id
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    if not team_details or not team_details['pokemon_details']:
+        await callback_query.message.edit_text("❌ Your team is empty!")
+        return
+    
+    # Create team display text
+    team_text = f"<b>📝 Edit {team_details['team_name']}</b>\n\n"
+    team_text += f"<b>Team Size:</b> {team_details['pokemon_count']}/{MAX_TEAM_SIZE}\n\n"
+    team_text += "<b>Current Team Order:</b>\n"
+    
+    for i, pokemon in enumerate(team_details['pokemon_details'], 1):
+        rarity_emoji = get_rarity_emoji(pokemon['rarity'])
+        pokemon_type = format_pokemon_type(pokemon.get('type', 'Unknown'))
+        team_text += f"<b>{i}.</b> {rarity_emoji} <b>{pokemon['name']}</b>\n"
+        team_text += f"    └ {pokemon['anime']} • {pokemon_type}\n"
+    
+    team_text += "\n📝 <b>Choose an edit option:</b>"
+    
+    keyboard = [
+        [InlineKeyboardButton("🔄 Swap Pokemon Positions", callback_data=f"team_edit_swap_menu_{user_id}")],
+        [InlineKeyboardButton("➡️ Move Pokemon Position", callback_data=f"team_edit_move_menu_{user_id}")],
+        [InlineKeyboardButton("🔄 Reverse Team Order", callback_data=f"team_edit_reverse_{user_id}")],
+        [InlineKeyboardButton("🔙 Back to Team", callback_data="back_to_team")]
+    ]
+    
+    await callback_query.message.edit_text(team_text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def show_swap_menu(client: Client, callback_query: CallbackQuery):
+    """Show Pokemon selection menu for swapping"""
+    user_id = callback_query.from_user.id
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    if not team_details or len(team_details['pokemon_details']) < 2:
+        await callback_query.answer("❌ You need at least 2 Pokemon to swap!", show_alert=True)
+        return
+    
+    text = "<b>🔄 Swap Pokemon Positions</b>\n\n"
+    text += "Select the <b>first Pokemon</b> to swap:\n\n"
+    
+    for i, pokemon in enumerate(team_details['pokemon_details'], 1):
+        rarity_emoji = get_rarity_emoji(pokemon['rarity'])
+        text += f"<b>{i}.</b> {rarity_emoji} {pokemon['name']}\n"
+    
+    # Create position selection buttons
+    keyboard = []
+    row = []
+    for i in range(len(team_details['pokemon_details'])):
+        row.append(InlineKeyboardButton(f"Position {i+1}", callback_data=f"swap_pos_{i+1}"))
+        if len(row) == 3:  # 3 buttons per row
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+    
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"edit_team_{user_id}")])
+    
+    await callback_query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def show_move_menu(client: Client, callback_query: CallbackQuery):
+    """Show Pokemon selection menu for moving"""
+    user_id = callback_query.from_user.id
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    if not team_details or len(team_details['pokemon_details']) < 2:
+        await callback_query.answer("❌ You need at least 2 Pokemon to move!", show_alert=True)
+        return
+    
+    text = "<b>➡️ Move Pokemon Position</b>\n\n"
+    text += "Select the Pokemon to move:\n\n"
+    
+    for i, pokemon in enumerate(team_details['pokemon_details'], 1):
+        rarity_emoji = get_rarity_emoji(pokemon['rarity'])
+        text += f"<b>{i}.</b> {rarity_emoji} {pokemon['name']}\n"
+    
+    # Create position selection buttons
+    keyboard = []
+    row = []
+    for i in range(len(team_details['pokemon_details'])):
+        row.append(InlineKeyboardButton(f"Position {i+1}", callback_data=f"move_from_{i+1}"))
+        if len(row) == 3:  # 3 buttons per row
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+    
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data=f"edit_team_{user_id}")])
+    
+    await callback_query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def handle_swap_selection(client: Client, callback_query: CallbackQuery):
+    """Handle swap position selection"""
+    # Extract position from callback data
+    position1 = int(callback_query.data.split("_")[-1])
+    
+    # Store first position in callback data and show second position selection
+    user_id = callback_query.from_user.id
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    text = f"<b>🔄 Swap Position {position1}</b>\n\n"
+    text += f"Selected: Position {position1}\n"
+    text += "\nNow select the <b>second position</b> to swap with:\n\n"
+    
+    for i, pokemon in enumerate(team_details['pokemon_details'], 1):
+        rarity_emoji = get_rarity_emoji(pokemon['rarity'])
+        status = " ← Selected" if i == position1 else ""
+        text += f"<b>{i}.</b> {rarity_emoji} {pokemon['name']}{status}\n"
+    
+    # Create buttons for second position (excluding the first selected position)
+    keyboard = []
+    row = []
+    for i in range(len(team_details['pokemon_details'])):
+        if i + 1 != position1:  # Exclude the already selected position
+            row.append(InlineKeyboardButton(f"Position {i+1}", callback_data=f"swap_exec_{position1}_{i+1}"))
+            if len(row) == 3:
+                keyboard.append(row)
+                row = []
+    if row:
+        keyboard.append(row)
+    
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data="team_edit_swap_menu")])
+    
+    await callback_query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
+async def handle_move_selection(client: Client, callback_query: CallbackQuery):
+    """Handle move position selection"""
+    # Extract position from callback data
+    from_position = int(callback_query.data.split("_")[-1])
+    
+    user_id = callback_query.from_user.id
+    team_details = await TeamManager.get_team_details(user_id)
+    
+    text = f"<b>➡️ Move from Position {from_position}</b>\n\n"
+    text += f"Selected: Position {from_position}\n"
+    text += "\nSelect the <b>new position</b>:\n\n"
+    
+    for i, pokemon in enumerate(team_details['pokemon_details'], 1):
+        rarity_emoji = get_rarity_emoji(pokemon['rarity'])
+        status = " ← Moving" if i == from_position else ""
+        text += f"<b>{i}.</b> {rarity_emoji} {pokemon['name']}{status}\n"
+    
+    # Create buttons for target position (excluding the current position)
+    keyboard = []
+    row = []
+    for i in range(len(team_details['pokemon_details'])):
+        if i + 1 != from_position:
+            row.append(InlineKeyboardButton(f"Position {i+1}", callback_data=f"move_exec_{from_position}_{i+1}"))
+            if len(row) == 3:
+                keyboard.append(row)
+                row = []
+    if row:
+        keyboard.append(row)
+    
+    keyboard.append([InlineKeyboardButton("🔙 Back", callback_data="team_edit_move_menu")])
+    
+    await callback_query.message.edit_text(text, reply_markup=InlineKeyboardMarkup(keyboard))
+
 def setup_team_handlers(app: Client):
     """Register team callback handlers"""
     print("Registering team callback handlers...")
     
-    # Only callback handlers - command handlers are in main.py
+    # Extended callback handlers for team editing
     app.on_callback_query(filters.regex(r"^(create_team|add_to_team|remove_from_team|clear_team|confirm_clear_team|team_help|back_to_team)$"))(team_callback_handler)
+    app.on_callback_query(filters.regex(r"^edit_team_\d+$"))(team_callback_handler)
+    app.on_callback_query(filters.regex(r"^team_edit_(swap_menu|move_menu|reverse)_\d+$"))(team_callback_handler)
+    app.on_callback_query(filters.regex(r"^(swap_pos_|move_from_|swap_exec_|move_exec_)\d+"))(team_callback_handler)
     
     print("Team callback handlers registered successfully!")
