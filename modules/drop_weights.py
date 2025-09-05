@@ -13,9 +13,9 @@ async def setup_drop_weights_and_limits(db):
             "Medium": 500,      # 50% of Common
             "Rare": 250,        # 25% of Common
             "Legendary": 180,   # 18% of Common
-            "Exclusive": 65,    # 6% of Common
-            "Elite": 55,        # 5.5% of Common
-            "Limited Edition": 45,
+            "Exclusive": 75,    # 6% of Common
+            "Elite": 65,        # 5.5% of Common
+            "Limited Edition": 55,
             "Ultimate": 0,     # 1.5% of Common
             "Supreme": 0,       # 0.8% of Common
             "Mythic": 0,       # 3% of Common
@@ -102,3 +102,4 @@ async def setup_drop_weights_and_limits(db):
         print(f"Error setting up drop weights and limits: {e}")
 
         return None 
+
