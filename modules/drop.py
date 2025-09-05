@@ -237,7 +237,7 @@ active_jackpots = {}  # chat_id: {code, amount, claimed_by, message_id}
 jackpot_counter = {}  # chat_id: current count (int)
 jackpot_next_interval = {}  # chat_id: next interval (int)
 
-BOT_USERNAME = "TestxmmarvelBot"
+BOT_USERNAME = "CollectXPokemonBot"
 
 async def drop_jackpot(client, chat_id):
     code = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
