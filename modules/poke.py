@@ -236,6 +236,7 @@ POKEMON_NAME_MAP = {
     "zacian (crowned sword form)": "zacian-crowned",
     "zamazenta (crowned shield form)": "zamazenta-crowned",
     "eternamax eternatus": "eternatus-eternamax",
+    "mega venusaur": "venusaur-mega"
 
 }
 
@@ -698,5 +699,6 @@ async def poke_callback_handler(client: Client, callback_query: CallbackQuery):
             await callback_query.answer()
         except Exception:
             await callback_query.answer("Unable to update.", show_alert=True)
+
 
 
