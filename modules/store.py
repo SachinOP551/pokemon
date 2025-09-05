@@ -97,12 +97,12 @@ RARITY_WEIGHTS = {
     "Exclusive": 1,
     "Elite": 1,
     "Limited Edition": 1,
-    "Ultimate":0,
+    "Ultimate":1,
     "Ethereal": 1,
     "Mythic": 1,
     "Zenith": 1,
     "Premium": 3,  # Added Premium with weight 1
-    "Mega Evolution": 1  # Added Mega Evolution with weight 1
+    "Mega Evolution": 0  # Added Mega Evolution with weight 1
     # "Supreme" is excluded
 }
 
@@ -574,4 +574,5 @@ async def refresh_all_stores_command(client: Client, message: Message):
         await db.update_user(user_id, {"store_offer": offer})
         updated += 1
     await message.reply(f"✅ Refreshed store for <b>{updated}</b> users.")
+
 
